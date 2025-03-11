@@ -34,5 +34,116 @@ library(GGally)
 
 ```{r}
 #| label: read data
-email<-read.csv("dataset22.csv")
+email<-read.csv("C:/Users/70652/Desktop/STATS5085 Data Analysis Skills/Project 2/DAS-Group-22/dataset22.csv")
+```
+
+```{r}
+#| label: convert cht to factor
+email$yesno<-as.factor(email$yesno)
+```
+
+## Exploratory Data Analysis {#sec-EDA}
+
+### Correlation
+
+```{r}
+#| label: fig-pairs
+#| fig-cap: Correlations between each variables.
+ggpairs(email[,1:6]) +
+  theme(plot.background = element_rect(
+    fill = "transparent",
+    colour = NA,
+    size = 1))
+```
+
+### Data Visualization
+
+```{r}
+#| label: fig-boxplot.crl.tot
+#| fig-cap: Boxplot of total length of uninterrupted sequences of capitals.
+ggplot(email, aes(x = yesno, y = crl.tot)) +
+  geom_boxplot() +
+  labs(x = "Spam indictor", y = "Uninterrupted sequences of capitals", 
+       title = "Spam indictor with total length of uninterrupted sequences of capitals")
+```
+
+```{r}
+#| label: fig-boxplot.dollar
+#| fig-cap: Boxplot of occurrences of the dollar sign.
+ggplot(email, aes(x = yesno, y = dollar)) +
+  geom_boxplot() +
+  labs(x = "Spam indictor", y = "Occurrences of the dollar sign", 
+       title = "Spam indictor with occurrences of the dollar sign")
+```
+
+```{r}
+#| label: fig-boxplot.bang
+#| fig-cap: Boxplot of occurrences of '!'.
+ggplot(email, aes(x = yesno, y = bang)) +
+  geom_boxplot() +
+  labs(x = "Spam indictor", y = 'Occurrences of "!"', 
+       title = 'Spam indictor with occurrences of "!"')
+```
+
+```{r}
+#| label: fig-boxplot.money
+#| fig-cap: Boxplot of occurrences of "money".
+ggplot(email, aes(x = yesno, y = money)) +
+  geom_boxplot() +
+  labs(x = "Spam indictor", y = 'Occurrences of "money"', 
+       title = 'Spam indictor with occurrences of "money"')
+```
+
+```{r}
+#| label: fig-boxplot.n000
+#| fig-cap: Boxplot of occurrences of '000'.
+ggplot(email, aes(x = yesno, y = n000)) +
+  geom_boxplot() +
+  labs(x = "Spam indictor", y = 'Occurrences of "000"', 
+       title = 'Spam indictor with occurrences of "000"')
+```
+
+```{r}
+#| label: fig-boxplot.make
+#| fig-cap: Boxplot of occurrences of 'make'.
+ggplot(email, aes(x = yesno, y = make)) +
+  geom_boxplot() +
+  labs(x = "Spam indictor", y = 'Occurrences of "make"', 
+       title = 'Spam indictor with occurrences of "make"')
+```
+
+## Formal Data Analysis
+
+```{r}
+#| label: fiting model1
+model1 <- glm(yesno ~ crl.tot+dollar+bang+money+n000+make, data = email, 
+             family = binomial(link = "logit"))
+```
+
+```{r}
+#| label: summary model1
+summary(model1)
+mod1coefs <- round(coef(model1), 2)
+```
+
+```{r}
+#| label: fiting model2
+model2 <- glm(yesno ~ crl.tot+dollar+bang+money+n000, data = email, 
+             family = binomial(link = "logit"))
+```
+
+```{r}
+#| label: summary model2
+summary(model2)
+mod2coefs <- round(coef(model2), 3)
+```
+
+\begin{align}
+\ln\left(\frac{p}{1-p}\right) &= \alpha + \beta_{crl.tot} \cdot \textrm{crl.tot} +\beta_{dollar} \cdot \textrm{dollar} +\beta_{bang} \cdot \textrm{bang} +\nonumber\\&\hspace{0.5cm}\beta_{money} \cdot \textrm{money} +\beta_{n000} \cdot \textrm{n000} \nonumber\\&= `r mod2coefs[1]` + `r mod2coefs[2]` \cdot \textrm{crl.tot} +`r mod2coefs[3]` \cdot \textrm{dollar} +`r mod2coefs[4]` \cdot \textrm{bang} +`r mod2coefs[5]` \cdot \textrm{money} +`r mod2coefs[6]`\cdot \textrm{n000} \nonumber
+\end{align}
+
+```{r}
+#| label: summary confident of model coefficient
+confint(model2) %>%
+  kable()
 ```
