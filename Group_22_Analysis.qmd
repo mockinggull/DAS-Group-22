@@ -19,11 +19,11 @@ execute:
 ```{r}
 #| label: libraries
 library(ggplot2)
-library(dplyr)
-library(moderndive)
-library(gapminder)
-library(skimr)
-library(tidyverse)
+#library(dplyr)
+#library(moderndive)
+#library(gapminder)
+#library(skimr)
+#library(tidyverse)
 library(gt)
 library(patchwork)
 library(gridExtra)
@@ -172,7 +172,7 @@ confint(model2) %>%
 ```
 
 ```{r}
-#| label: fig-CI of Log-odds
+#| label: fig-CI-of-Log-odds
 #| fig-cap: 95% CI of confidents in Log-odds.
 plot_model(model2, show.values = TRUE, transform = NULL,
            title = "Log-Odds (Email indicator)", show.p = TRUE)
@@ -201,7 +201,7 @@ model2 %>%
 
 
 ```{r}
-#| label: fig-CI of odds scale
+#| label: fig-CI-of-odds-scale
 #| fig-cap: 95% CI of confidents in odds.
 plot_model(model2, show.values = TRUE,
            title = "Odds (Email indicator)", show.p = FALSE)
@@ -213,24 +213,6 @@ We can obtain the probability $p=\text{Prob}(\text{spam})$ by
 $$
 p=\frac{exp(`r mod2coefs[1]` + `r mod2coefs[2]` \cdot \textrm{crl.tot} +`r mod2coefs[3]` \cdot \textrm{dollar} +`r mod2coefs[4]` \cdot \textrm{bang} +`r mod2coefs[5]` \cdot \textrm{money} +`r mod2coefs[6]`\cdot \textrm{n000})}{1+exp(`r mod2coefs[1]` + `r mod2coefs[2]` \cdot \textrm{crl.tot} +`r mod2coefs[3]` \cdot \textrm{dollar} +`r mod2coefs[4]` \cdot \textrm{bang} +`r mod2coefs[5]` \cdot \textrm{money} +`r mod2coefs[6]`\cdot \textrm{n000})}
 $$
-
-
-We can plot the probability of being filtered as spam
-```{r}
-#| label: fig-probability
-#| fig-cap: The probability of being filtered as spam.
-ggplot(data = email, aes(x = age, y = probs.male)) +
-  geom_smooth(method="glm", 
-              method.args = list(family="binomial"), 
-              se = FALSE) +
-  labs(x = "Age", y = "Probability of instructor being male")
-```
-
-
-
-
-
-
 
 
 ## Conclusion
