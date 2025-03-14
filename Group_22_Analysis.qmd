@@ -73,7 +73,7 @@ ggplot(email, aes(x = yesno, y = crl.tot)) +
   labs(x = "Spam indictor", y = "Uninterrupted sequences of capitals", 
        title = "Spam indictor with total length of uninterrupted sequences of capitals")
 ```
-
+sjfeifjes
 ```{r}
 #| label: fig-boxplot.dollar
 #| fig-cap: Boxplot of occurrences of the dollar sign.
