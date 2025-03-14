@@ -31,6 +31,7 @@ library(broom)
 library(knitr)
 library(GGally)
 library(sjPlot)
+library(MASS)
 ```
 
 ```{r}
@@ -124,9 +125,15 @@ ggplot(email, aes(x = yesno, y = make)) +
 ### Fitting Model in Log-odds
 
 ```{r}
-#| label: fiting model1
-model1 <- glm(yesno ~ crl.tot+dollar+bang+money+n000+make, data = email, 
-             family = binomial(link = "logit"))
+#| label: Forward-Backward Selection
+full_model <- glm(yesno ~ crl.tot+dollar+bang+money+n000+make, data = email, family = binomial(link = "logit"))# Full model (all predictors)
+initial_model <- glm(yesno ~ 1, data = email, family = binomial(link = "logit"))  # Null model (only intercept)
+# Perform forward-backward selection
+stepwise_model <- stepAIC(initial_model, 
+                          scope = list(lower = initial_model, upper = full_model), direction = "both")
+
+# Display selected model
+summary(stepwise_model)
 ```
 
 ```{r}
