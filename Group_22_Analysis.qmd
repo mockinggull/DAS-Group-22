@@ -42,6 +42,9 @@ email$yesno<-as.factor(email$yesno)
 
 ## Introduction
 
+This analysis focuses on identifying the characteristics of email messages that are predictive of spam. With the rise of unwanted and potentially harmful emails, effective spam detection has become a crucial challenge. By analysing patterns in email content, structure, and metadata, we aim to identify the distinguishing features that separate spam from legitimate messages. Gaining a deeper understanding of these characteristics can lead to the development of smarter, more accurate filtering systems that reduce inbox clutter and protect users from scams and other malicious activities. 
+
+
 ## Exploratory Data Analysis {#sec-EDA}
 
 ### Correlation
