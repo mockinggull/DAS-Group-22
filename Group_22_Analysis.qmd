@@ -42,12 +42,11 @@ email$yesno<-as.factor(email$yesno)
 
 ## Introduction
 
-This analysis focuses on identifying the characteristics of email messages that are predictive of spam. With the rise of unwanted and potentially harmful emails, effective spam detection has become a crucial challenge. By analysing patterns in email content, structure, and metadata, we aim to identify the distinguishing features that separate spam from legitimate messages. Gaining a deeper understanding of these characteristics can lead to the development of smarter, more accurate filtering systems that reduce inbox clutter and protect users from scams and other malicious activities. 
-
+This analysis focuses on identifying the characteristics of email messages that are predictive of spam. With the rise of unwanted and potentially harmful emails, effective spam detection has become a crucial challenge. By analysing patterns in email content, structure, and metadata, we aim to identify the distinguishing features that separate spam from legitimate messages. Gaining a deeper understanding of these characteristics can lead to the development of smarter, more accurate filtering systems that reduce inbox clutter and protect users from scams and other malicious activities.
 
 ## Exploratory Data Analysis {#sec-EDA}
 
-### Correlation
+### Data Visualization
 
 ```{r}
 #| label: fig-pairs
@@ -59,12 +58,61 @@ ggpairs(email[,1:6]) +
     size = 1))
 ```
 
+By @fig-pairs, we see that the correlations between each explanatory is not larger than 0.4, which means the relationship between each variable is weak. It suggests that there is not much concern about multicollinearity. From the scatter plot, there are some points are far away from cluster. Those points can be removed as outliers to improve model's stability.
+
+### Removing Outliers
+
+```{r}
+#| label: Remove Outliers by z score
+remove_outliers_rowwise_zscore <- function(df) {
+  df_clean <- df
+  for (col_name in names(df)) {
+    if (is.numeric(df[[col_name]])) {
+      z_scores <- scale(df[[col_name]])
+      df_clean <- df_clean[abs(z_scores) <= 3, ]
+    }
+  }
+  return(na.omit(df_clean))
+}
+email_clean <- remove_outliers_rowwise_zscore(email)
+```
+
+To minimize outliers while preserving as much information as possible, z score are used to remove outliers.
+
+### Scaling Data
+
+```{r}
+#| label: tbl-range
+#| tbl-cap: Range of each variables.
+range_table <- apply(email_clean[-7], 2, range)
+range_df <- as.data.frame(t(range_table))
+colnames(range_df) <- c("Min", "Max")
+range_df$Variables<-colnames(email_clean[-7])
+gt(range_df[,c(3,1,2)])
+```
+
+After removing outliers, the @tbl-range shows the range of each variable. It is clear that the range of the number of total length of uninterrupted sequences of capitals is extremely large than others. Hence, normalization are processed to reduce bias when large scale may dominates the cost function.
+
+```{r}
+#| label: tbl-scaled_range
+#| tbl-cap: Range of each scaled variables.
+email_clean$crl.tot<-scale(email_clean$crl.tot)
+range_table <- apply(email_clean[-7], 2, range)
+range_df <- as.data.frame(t(range_table))
+colnames(range_df) <- c("Min", "Max")
+range_df$Variables<-colnames(email_clean[-7])
+gt(range_df[, c(3,1,2)]) %>%
+  fmt_number(columns = everything(),decimals = 2)
+```
+
+After scaling，the range of the number of total length of uninterrupted sequences of capitals is shrank to a range which is close to others. 
+
 ### Data Visualization
 
 ```{r}
 #| label: fig-boxplot.crl.tot
 #| fig-cap: Boxplot of total length of uninterrupted sequences of capitals.
-ggplot(email, aes(x = yesno, y = crl.tot)) +
+ggplot(email_clean, aes(x = yesno, y = crl.tot)) +
   geom_boxplot() +
   labs(x = "Spam indictor", y = "Uninterrupted sequences of capitals", 
        title = "Spam indictor with total length of uninterrupted sequences of capitals")
@@ -73,7 +121,7 @@ ggplot(email, aes(x = yesno, y = crl.tot)) +
 ```{r}
 #| label: fig-boxplot.dollar
 #| fig-cap: Boxplot of occurrences of the dollar sign.
-ggplot(email, aes(x = yesno, y = dollar)) +
+ggplot(email_clean, aes(x = yesno, y = dollar)) +
   geom_boxplot() +
   labs(x = "Spam indictor", y = "Occurrences of the dollar sign", 
        title = "Spam indictor with occurrences of the dollar sign")
@@ -82,7 +130,7 @@ ggplot(email, aes(x = yesno, y = dollar)) +
 ```{r}
 #| label: fig-boxplot.bang
 #| fig-cap: Boxplot of occurrences of '!'.
-ggplot(email, aes(x = yesno, y = bang)) +
+ggplot(email_clean, aes(x = yesno, y = bang)) +
   geom_boxplot() +
   labs(x = "Spam indictor", y = 'Occurrences of "!"', 
        title = 'Spam indictor with occurrences of "!"')
@@ -91,7 +139,7 @@ ggplot(email, aes(x = yesno, y = bang)) +
 ```{r}
 #| label: fig-boxplot.money
 #| fig-cap: Boxplot of occurrences of "money".
-ggplot(email, aes(x = yesno, y = money)) +
+ggplot(email_clean, aes(x = yesno, y = money)) +
   geom_boxplot() +
   labs(x = "Spam indictor", y = 'Occurrences of "money"', 
        title = 'Spam indictor with occurrences of "money"')
@@ -100,7 +148,7 @@ ggplot(email, aes(x = yesno, y = money)) +
 ```{r}
 #| label: fig-boxplot.n000
 #| fig-cap: Boxplot of occurrences of '000'.
-ggplot(email, aes(x = yesno, y = n000)) +
+ggplot(email_clean, aes(x = yesno, y = n000)) +
   geom_boxplot() +
   labs(x = "Spam indictor", y = 'Occurrences of "000"', 
        title = 'Spam indictor with occurrences of "000"')
@@ -109,7 +157,7 @@ ggplot(email, aes(x = yesno, y = n000)) +
 ```{r}
 #| label: fig-boxplot.make
 #| fig-cap: Boxplot of occurrences of 'make'.
-ggplot(email, aes(x = yesno, y = make)) +
+ggplot(email_clean, aes(x = yesno, y = make)) +
   geom_boxplot() +
   labs(x = "Spam indictor", y = 'Occurrences of "make"', 
        title = 'Spam indictor with occurrences of "make"')
@@ -121,7 +169,7 @@ ggplot(email, aes(x = yesno, y = make)) +
 
 ```{r}
 #| label: fiting model1
-model1 <- glm(yesno ~ crl.tot+dollar+bang+money+n000+make, data = email, 
+model1 <- glm(yesno ~ crl.tot+dollar+bang+money+n000+make, data = email_clean, 
              family = binomial(link = "logit"))
 ```
 
@@ -132,24 +180,14 @@ library(jtools)
 summary(model1)
 mod1coefs <- round(coef(model1), 2)
 ```
+
 \begin{align}
 \ln\left(\frac{p}{1-p}\right) &= \alpha + \beta_{crl.tot} \cdot \textrm{crl.tot} +\beta_{dollar} \cdot \textrm{dollar} +\beta_{bang} \cdot \textrm{bang} +\nonumber\\&\hspace{0.5cm}\beta_{money} \cdot \textrm{money} +\beta_{n000} \cdot \textrm{n000}+\beta_{make} \cdot \textrm{make} \nonumber\\&= `r mod1coefs[1]` + `r mod1coefs[2]` \cdot \textrm{crl.tot} +`r mod1coefs[3]` \cdot \textrm{dollar} +`r mod1coefs[4]` \cdot \textrm{bang} +`r mod1coefs[5]` \cdot \textrm{money} +`r mod1coefs[6]`\cdot \textrm{n000}+`r mod1coefs[7]`\cdot \textrm{make} \nonumber
 \end{align}
 
-
-
-
-
-
-
-
-
-
-
-
 ```{r}
 #| label: fiting model2
-model2 <- glm(yesno ~ crl.tot+dollar+bang+money+n000, data = email, 
+model2 <- glm(yesno ~ crl.tot+dollar+bang+money+n000, data = email_clean, 
              family = binomial(link = "logit"))
 ```
 
@@ -183,8 +221,8 @@ plot_model(model2, show.values = TRUE, transform = NULL,
            title = "Log-Odds (Email indicator)", show.p = TRUE)
 ```
 
-
 ### Variable Selection
+
 ```{r}
 #| label: p_value_Comparation
 #| tbl-cap: p value Comparation.
@@ -203,12 +241,6 @@ combined_results %>%
   fmt_number(columns = c(P_Value_Model1, P_Value_Model2), decimals = 3)
 ```
 
-
-
-
-
-
-
 ```{r}
 #| label: Devariance_Comparation
 #| tbl-cap: Devariance Comparation.
@@ -218,10 +250,6 @@ dev_model2 <- deviance(model2)  # Residual deviance of model2
 cat("Deviance of Model 1:", dev_model1, "\n")
 cat("Deviance of Model 2:", dev_model2, "\n")
 ```
-
-
-
-
 
 ```{r}
 #| label: AIC_BIC
@@ -233,13 +261,6 @@ model_comparison <- bind_rows(
   dplyr::select(Model, AIC, BIC)
 kable(model_comparison, digits = 2, caption = "Model comparison values for different models")# Print the table with kable
 ```
-
-
-
-
-
-
-
 
 ### Odds
 
