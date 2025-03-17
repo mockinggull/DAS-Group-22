@@ -94,19 +94,25 @@ gt(range_df[,c(3,1,2)])
 After removing outliers, the @tbl-range shows the range of each variable. It is clear that the range of the number of total length of uninterrupted sequences of capitals is extremely large than others. Hence, normalization are processed to reduce bias when large scale may dominates the cost function.
 
 ```{r}
-#| label: Scaling Data
+#| label: tbl-scaled_range
+#| tbl-cap: Range of each scaled variables.
 email_clean$crl.tot<-scale(email_clean$crl.tot)
+range_table <- apply(email_clean[-7], 2, range)
+range_df <- as.data.frame(t(range_table))
+colnames(range_df) <- c("Min", "Max")
+range_df$Variables<-colnames(email_clean[-7])
+gt(range_df[, c(3,1,2)]) %>%
+  fmt_number(columns = everything(),decimals = 2)
 ```
 
-
-
+After scaling，the range of the number of total length of uninterrupted sequences of capitals is shrank to a range which is close to others. 
 
 ### Data Visualization
 
 ```{r}
 #| label: fig-boxplot.crl.tot
 #| fig-cap: Boxplot of total length of uninterrupted sequences of capitals.
-ggplot(email, aes(x = yesno, y = crl.tot)) +
+ggplot(email_clean, aes(x = yesno, y = crl.tot)) +
   geom_boxplot() +
   labs(x = "Spam indictor", y = "Uninterrupted sequences of capitals", 
        title = "Spam indictor with total length of uninterrupted sequences of capitals")
@@ -115,7 +121,7 @@ ggplot(email, aes(x = yesno, y = crl.tot)) +
 ```{r}
 #| label: fig-boxplot.dollar
 #| fig-cap: Boxplot of occurrences of the dollar sign.
-ggplot(email, aes(x = yesno, y = dollar)) +
+ggplot(email_clean, aes(x = yesno, y = dollar)) +
   geom_boxplot() +
   labs(x = "Spam indictor", y = "Occurrences of the dollar sign", 
        title = "Spam indictor with occurrences of the dollar sign")
@@ -124,7 +130,7 @@ ggplot(email, aes(x = yesno, y = dollar)) +
 ```{r}
 #| label: fig-boxplot.bang
 #| fig-cap: Boxplot of occurrences of '!'.
-ggplot(email, aes(x = yesno, y = bang)) +
+ggplot(email_clean, aes(x = yesno, y = bang)) +
   geom_boxplot() +
   labs(x = "Spam indictor", y = 'Occurrences of "!"', 
        title = 'Spam indictor with occurrences of "!"')
@@ -133,7 +139,7 @@ ggplot(email, aes(x = yesno, y = bang)) +
 ```{r}
 #| label: fig-boxplot.money
 #| fig-cap: Boxplot of occurrences of "money".
-ggplot(email, aes(x = yesno, y = money)) +
+ggplot(email_clean, aes(x = yesno, y = money)) +
   geom_boxplot() +
   labs(x = "Spam indictor", y = 'Occurrences of "money"', 
        title = 'Spam indictor with occurrences of "money"')
@@ -142,7 +148,7 @@ ggplot(email, aes(x = yesno, y = money)) +
 ```{r}
 #| label: fig-boxplot.n000
 #| fig-cap: Boxplot of occurrences of '000'.
-ggplot(email, aes(x = yesno, y = n000)) +
+ggplot(email_clean, aes(x = yesno, y = n000)) +
   geom_boxplot() +
   labs(x = "Spam indictor", y = 'Occurrences of "000"', 
        title = 'Spam indictor with occurrences of "000"')
@@ -151,7 +157,7 @@ ggplot(email, aes(x = yesno, y = n000)) +
 ```{r}
 #| label: fig-boxplot.make
 #| fig-cap: Boxplot of occurrences of 'make'.
-ggplot(email, aes(x = yesno, y = make)) +
+ggplot(email_clean, aes(x = yesno, y = make)) +
   geom_boxplot() +
   labs(x = "Spam indictor", y = 'Occurrences of "make"', 
        title = 'Spam indictor with occurrences of "make"')
@@ -163,7 +169,7 @@ ggplot(email, aes(x = yesno, y = make)) +
 
 ```{r}
 #| label: fiting model1
-model1 <- glm(yesno ~ crl.tot+dollar+bang+money+n000+make, data = email, 
+model1 <- glm(yesno ~ crl.tot+dollar+bang+money+n000+make, data = email_clean, 
              family = binomial(link = "logit"))
 ```
 
@@ -181,7 +187,7 @@ mod1coefs <- round(coef(model1), 2)
 
 ```{r}
 #| label: fiting model2
-model2 <- glm(yesno ~ crl.tot+dollar+bang+money+n000, data = email, 
+model2 <- glm(yesno ~ crl.tot+dollar+bang+money+n000, data = email_clean, 
              family = binomial(link = "logit"))
 ```
 
