@@ -18,6 +18,7 @@ execute:
 
 ```{r}
 #| label: libraries
+library(tibble)
 library(ggplot2)
 library(dplyr)
 library(gt)
@@ -40,13 +41,13 @@ email<-read.csv("dataset22.csv")
 email$yesno<-as.factor(email$yesno)
 ```
 
-## Introduction
+# Introduction
 
 This analysis focuses on identifying the characteristics of email messages that are predictive of spam. With the rise of unwanted and potentially harmful emails, effective spam detection has become a crucial challenge. By analysing patterns in email content, structure, and metadata, we aim to identify the distinguishing features that separate spam from legitimate messages. Gaining a deeper understanding of these characteristics can lead to the development of smarter, more accurate filtering systems that reduce inbox clutter and protect users from scams and other malicious activities.
 
-## Exploratory Data Analysis {#sec-EDA}
+# Exploratory Data Analysis {#sec-EDA}
 
-### Data Visualization
+## Data Visualization
 
 ```{r}
 #| label: fig-pairs
@@ -60,7 +61,7 @@ ggpairs(email[,1:6]) +
 
 By @fig-pairs, we see that the correlations between each explanatory is not larger than 0.4, which means the relationship between each variable is weak. It suggests that there is not much concern about multicollinearity. From the scatter plot, there are some points are far away from cluster. Those points can be removed as outliers to improve model's stability.
 
-### Removing Outliers
+## Removing Outliers
 
 ```{r}
 #| label: Remove Outliers by z score
@@ -79,7 +80,7 @@ email_clean <- remove_outliers_rowwise_zscore(email)
 
 To minimize outliers while preserving as much information as possible, z score are used to remove outliers.
 
-### Scaling Data
+## Scaling Data
 
 ```{r}
 #| label: tbl-range
@@ -107,7 +108,7 @@ gt(range_df[, c(3,1,2)]) %>%
 
 After scaling，the range of the number of total length of uninterrupted sequences of capitals is shrank to a range which is close to others.
 
-### Data Visualization
+## Data Visualization
 
 ```{r}
 #| label: fig-boxplot.crl.tot
@@ -163,9 +164,9 @@ ggplot(email_clean, aes(x = yesno, y = make)) +
        title = 'Spam indictor with occurrences of "make"')
 ```
 
-## Formal Data Analysis
+# Formal Data Analysis
 
-### Fitting Model in Log-odds
+## Fitting Model in Log-odds
 
 ```{r}
 #| label: fiting model1
@@ -175,13 +176,11 @@ model1 <- glm(yesno ~ crl.tot+dollar+bang+money+n000+make, data = email_clean,
 
 ```{r}
 #| label: summary model1
-#| tbl-cap: Summary of model1.
-library(jtools)
 summary(model1)
 mod1coefs <- round(coef(model1), 2)
 ```
 
-\begin{align}
+The fitted linear model 1 is \begin{align}
 \ln\left(\frac{p}{1-p}\right) &= \alpha + \beta_{crl.tot} \cdot \textrm{crl.tot} +\beta_{dollar} \cdot \textrm{dollar} +\beta_{bang} \cdot \textrm{bang} +\nonumber\\&\hspace{0.5cm}\beta_{money} \cdot \textrm{money} +\beta_{n000} \cdot \textrm{n000}+\beta_{make} \cdot \textrm{make} \nonumber\\&= `r mod1coefs[1]` + `r mod1coefs[2]` \cdot \textrm{crl.tot} +`r mod1coefs[3]` \cdot \textrm{dollar} +`r mod1coefs[4]` \cdot \textrm{bang} +`r mod1coefs[5]` \cdot \textrm{money} +`r mod1coefs[6]`\cdot \textrm{n000}+`r mod1coefs[7]`\cdot \textrm{make} \nonumber
 \end{align}
 
@@ -193,34 +192,33 @@ model2 <- glm(yesno ~ crl.tot+dollar+bang+money+n000, data = email_clean,
 
 ```{r}
 #| label: summary model2
-#| tbl-cap: Summary of model2.
 summary(model2)
 mod2coefs <- round(coef(model2), 3)
 ```
 
-To interpret this fitted model, firstly we note that the baseline category for our binary response is no
+To interpret this fitted model, firstly we note that the baseline category for our binary response is no.
 
 ```{r}
 #| label: Find out the baseline category.
 levels(email$yesno)
 ```
 
-This means that estimates from the logistic regression model are for a change on the log-odds scale for yes in comparison to the response baseline no. We can extract the estimated coefficients to report the fitted model as follows...
+This means that estimates from the logistic regression model are for a change on the log-odds scale for yes in comparison to the response baseline no.
 
-\begin{align}
-\ln\left(\frac{p}{1-p}\right) &= \alpha + \beta_{crl.tot} \cdot \textrm{crl.tot} +\beta_{dollar} \cdot \textrm{dollar} +\beta_{bang} \cdot \textrm{bang} +\nonumber\\&\hspace{0.5cm}\beta_{money} \cdot \textrm{money} +\beta_{n000} \cdot \textrm{n000} \nonumber\\&= `r mod2coefs[1]` + `r mod2coefs[2]` \cdot \textrm{crl.tot} +`r mod2coefs[3]` \cdot \textrm{dollar} +`r mod2coefs[4]` \cdot \textrm{bang} +`r mod2coefs[5]` \cdot \textrm{money} +`r mod2coefs[6]`\cdot \textrm{n000} \nonumber
-\end{align}
+We can extract the estimated coefficients to report the fitted model as follows. The fitted linear model 2 is \begin{align}
+\ln\left(\frac{p}{1-p}\right) &= \alpha + \beta_{crl.tot} \cdot \textrm{crl.tot} +\beta_{dollar} \cdot \textrm{dollar} +\beta_{bang} \cdot \textrm{bang} +\nonumber\\&\hspace{0.5cm}\beta_{money} \cdot \textrm{money} +\beta_{n000} \cdot \textrm{n000} \nonumber\\&= `r mod2coefs[1]` + `r mod2coefs[2]` \cdot \textrm{crl.tot} +`r mod2coefs[3]` \cdot \textrm{dollar} +`r mod2coefs[4]` \cdot \textrm{bang} +\\&`r mod2coefs[5]` \cdot \textrm{money} +`r mod2coefs[6]`\cdot \textrm{n000} \nonumber
+\end{align} where $p=\text{Prob}(yes)$ and $1-p=\text{Prob}(no)$. Hence, the log-odds of the instructor being spam increase by 0.443 for every one unit increase in scaled total length of uninterrupted sequences of capitals, when keeping other variables constant. Similarly, for a percentage of total number of characters for dollar sign, exclamation mark, money, and 000 for every one unit increase separately, the log-odds of the instructor being spam increase by 7.759, 2.732, 6.039, and 2.926.
 
 This provides us with a point estimate of how the log-odds changes with explanatory variables, however, we are also interested in producing a 95% confidence interval for these log-odds.
 
 ```{r}
-#| label: summary_confident_of_model2_coefficient
+#| label: tbl-summary_confident_of_model2_coefficient
 #| tbl-cap: Summary confident of model2 coefficient.
 confint(model2) %>%
   kable()
 ```
 
-Hence, the point estimate for crl.tot is 0.44, which has a corresponding 95% confidence interval of (0.23, 0.66). Similarly, the point estimate for dollar is 7.76, with a 95% confidence interval of (4.90, 10.91). For bang, the point estimate is 2.73, with a 95% confidence interval of (2.11, 3.42). For money, the point estimate is 6.04, with a 95% confidence interval of (3.58, 9.22). For n000, the point estimate is 2.93, with a 95% confidence interval of (1.24, 5.14). This can be displayed graphically as follows...
+Hence, by @tbl-summary_confident_of_model2_coefficient, the point estimate for crl.tot is 0.44, which has a corresponding 95% confidence interval of (0.23, 0.66). Similarly, the point estimate for dollar is 7.76, with a 95% confidence interval of (4.90, 10.91). For bang, the point estimate is 2.73, with a 95% confidence interval of (2.11, 3.42). For money, the point estimate is 6.04, with a 95% confidence interval of (3.58, 9.22). For n000, the point estimate is 2.93, with a 95% confidence interval of (1.24, 5.14). This can be displayed graphically in the @fig-CI-of-Log-odds.
 
 ```{r}
 #| label: fig-CI-of-Log-odds
@@ -229,10 +227,10 @@ plot_model(model2, show.values = TRUE, transform = NULL,
            title = "Log-Odds (Email indicator)", show.p = TRUE)
 ```
 
-### Variable Selection
+## Variable Selection
 
 ```{r}
-#| label: p_value_Comparation
+#| label: tbl-p_value_Comparation
 #| tbl-cap: p value Comparation.
 p_values1 <- summary(model1)$coefficients[, "Pr(>|z|)"]
 p_values2 <- summary(model2)$coefficients[, "Pr(>|z|)"]
@@ -248,6 +246,8 @@ combined_results %>%
   gt() %>%
   fmt_number(columns = c(P_Value_Model1, P_Value_Model2), decimals = 3)
 ```
+
+After fitting model
 
 ```{r}
 #| label: Devariance_Comparation
@@ -270,7 +270,7 @@ model_comparison <- bind_rows(
 kable(model_comparison, digits = 2, caption = "Model comparison values for different models")# Print the table with kable
 ```
 
-### Odds
+## Odds
 
 We can obtain the odds scale $\frac{p}{1-p}$ by
 
@@ -279,58 +279,32 @@ $$
 $$
 
 ```{r}
-#| label: Getting odds scale.
+#| label: tbl-odds_scale
+#| tbl-cap: The odds scale of each variables.
 model2 %>%
  coef() %>%
-  exp()
+  exp() %>%
+  t()%>%
+  as.data.frame() %>%
+  gt()
+  
 ```
 
-On the odds scale, the value of the intercept (0.19) give the odds of a email being spam given all explanatory variables equals 0. For crl.tot we have an odds of 1.56, which indicates that for every 1 unit increase in crl.tot, the odds of the email being spam increase by a factor of 1.56.
+The @tbl-odds_scale shows the odds scale of each variables.
 
-$$
-\begin{align}
-\small
-\frac{\mbox{Odds}_{\scriptsize \mbox{crl.tot=2}}}{\mbox{Odds}_{\scriptsize \mbox{crl.tot=1}}} = \left(\frac{\frac{p_{\scriptsize \mbox{crl.tot=2}}}{1 - p_{\scriptsize \mbox{crl.tot=2}}}}{\frac{p_{\scriptsize \mbox{crl.tot=1}}}{1 - p_{\scriptsize \mbox{crl.tot=1}}}}\right) = \exp\left(\beta_{crl.tot} \cdot (2 - 1)\right) = \exp\left(0.44\right) = 1.56 \nonumber
-\end{align}
-$$
+-   On the odds scale, the value of the intercept (0.19) give the odds of a email being spam given all explanatory variables equals 0.
 
-For dollar we have an odds of 2343.40, which indicates that for every 1 unit increase in dollar, the odds of the email being spam increase by a factor of 2343.40. 
+-   For total length of uninterrupted sequences of capitals, we have an odds of 1.56, which indicates that for every 1 unit increase in crl.tot, the probability of the email being spam increase by 56%.
 
-$$
-\begin{align}
-\small
-\frac{\mbox{Odds}_{\scriptsize \mbox{dollar=2}}}{\mbox{Odds}_{\scriptsize \mbox{dollar=1}}} = \left(\frac{\frac{p_{\scriptsize \mbox{dollar=2}}}{1 - p_{\scriptsize \mbox{dollar=2}}}}{\frac{p_{\scriptsize \mbox{dollar=1}}}{1 - p_{\scriptsize \mbox{dollar=1}}}}\right) = \exp\left(\beta_{dollar} \cdot (2 - 1)\right) = \exp\left(7.76\right) = 2343.40 \nonumber
-\end{align}
-$$
+-   For a percentage of total number of occurrences of the dollar sign, we have an odds of 2343.40, which indicates that for every 1 unit increase in dollar, the probability of the email being spam increase by a factor of 234240%.
 
-For bang we have an odds of 15.36, which indicates that for every 1 unit increase in bang, the odds of the email being spam increase by a factor of 15.36. 
+-   For a percentage of total number of occurrences of the exclamation mark, we have an odds of 15.36, which indicates that for every 1 unit increase in bang, the probability of the email being spam increase by a factor of 1436%.
 
-$$
-\begin{align}
-\small
-\frac{\mbox{Odds}_{\scriptsize \mbox{bang=2}}}{\mbox{Odds}_{\scriptsize \mbox{bang=1}}} = \left(\frac{\frac{p_{\scriptsize \mbox{bang=2}}}{1 - p_{\scriptsize \mbox{bang=2}}}}{\frac{p_{\scriptsize \mbox{bang=1}}}{1 - p_{\scriptsize \mbox{bang=1}}}}\right) = \exp\left(\beta_{bang} \cdot (2 - 1)\right) = \exp\left(2.73\right) = 15.36 \nonumber
-\end{align}
-$$
+-   For a percentage of total number of occurrences of money, we have an odds of 419.31, which indicates that for every 1 unit increase in money, the probability of the email being spam increase by a factor of 41831%.
 
-For money we have an odds of 419.31, which indicates that for every 1 unit increase in money, the odds of the email being spam increase by a factor of 419.31.
+-   For a percentage of total number of occurrences of '000', we have an odds of 18.65, which indicates that for every 1 unit increase in n000, the odds of the email being spam increase by a factor of 1765%.
 
-$$
-\begin{align}
-\small
-\frac{\mbox{Odds}_{\scriptsize \mbox{money=2}}}{\mbox{Odds}_{\scriptsize \mbox{money=1}}} = \left(\frac{\frac{p_{\scriptsize \mbox{money=2}}}{1 - p_{\scriptsize \mbox{money=2}}}}{\frac{p_{\scriptsize \mbox{money=1}}}{1 - p_{\scriptsize \mbox{money=1}}}}\right) = \exp\left(\beta_{money} \cdot (2 - 1)\right) = \exp\left(6.04\right) = 419.31 \nonumber
-\end{align}
-$$
-
-For n000 we have an odds of 18.65, which indicates that for every 1 unit increase in n000, the odds of the email being spam increase by a factor of 18.65. 
-
-$$
-\begin{align}
-\small
-\frac{\mbox{Odds}_{\scriptsize \mbox{n000=2}}}{\mbox{Odds}_{\scriptsize \mbox{n000=1}}} = \left(\frac{\frac{p_{\scriptsize \mbox{n000=2}}}{1 - p_{\scriptsize \mbox{n000=2}}}}{\frac{p_{\scriptsize \mbox{n000=1}}}{1 - p_{\scriptsize \mbox{n000=1}}}}\right) = \exp\left(\beta_{n000} \cdot (2 - 1)\right) = \exp\left(2.93\right) = 18.65 \nonumber
-\end{align}
-$$
-
-The corresponding 95% confidence interval of odds can be displayed graphically.
+The corresponding 95% confidence interval of odds can be displayed graphically in @fig-CI-of-odds-scale.
 
 ```{r}
 #| label: fig-CI-of-odds-scale
@@ -339,10 +313,9 @@ plot_model(model2, show.values = TRUE,
            title = "Odds (Email indicator)", show.p = FALSE)
 ```
 
-### Probabilities
+## Probabilities
 
 We can obtain the probability $p=\text{Prob}(\text{spam})$ by $$
-p=\frac{exp(`r mod2coefs[1]` + `r mod2coefs[2]` \cdot \textrm{crl.tot} +`r mod2coefs[3]` \cdot \textrm{dollar} +`r mod2coefs[4]` \cdot \textrm{bang} +`r mod2coefs[5]` \cdot \textrm{money} +`r mod2coefs[6]`\cdot \textrm{n000})}{1+exp(`r mod2coefs[1]` + `r mod2coefs[2]` \cdot \textrm{crl.tot} +`r mod2coefs[3]` \cdot \textrm{dollar} +`r mod2coefs[4]` \cdot \textrm{bang} +`r mod2coefs[5]` \cdot \textrm{money} +`r mod2coefs[6]`\cdot \textrm{n000})}
-$$
+p=\frac{exp(`r mod2coefs[1]` + `r mod2coefs[2]` \cdot \textrm{crl.tot} +`r mod2coefs[3]` \cdot \textrm{dollar} +`r mod2coefs[4]` \cdot \textrm{bang} +`r mod2coefs[5]` \cdot \textrm{money} +`r mod2coefs[6]`\cdot \textrm{n000})}{1+exp(`r mod2coefs[1]` + `r mod2coefs[2]` \cdot \textrm{crl.tot} +`r mod2coefs[3]` \cdot \textrm{dollar} +`r mod2coefs[4]` \cdot \textrm{bang} +`r mod2coefs[5]` \cdot \textrm{money} +`r mod2coefs[6]`\cdot \textrm{n000})}$$
 
-## Conclusion
+# Conclusion
