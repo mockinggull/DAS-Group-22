@@ -18,6 +18,7 @@ execute:
 
 ```{r}
 #| label: libraries
+library(tibble)
 library(ggplot2)
 library(dplyr)
 library(gt)
@@ -240,6 +241,14 @@ combined_results %>%
   gt() %>%
   fmt_number(columns = c(P_Value_Model1, P_Value_Model2), decimals = 3)
 ```
+After fitting model 
+
+
+
+
+
+
+
 
 ```{r}
 #| label: Devariance_Comparation
@@ -250,6 +259,11 @@ dev_model2 <- deviance(model2)  # Residual deviance of model2
 cat("Deviance of Model 1:", dev_model1, "\n")
 cat("Deviance of Model 2:", dev_model2, "\n")
 ```
+
+
+
+
+
 
 ```{r}
 #| label: AIC_BIC
@@ -274,7 +288,11 @@ $$
 #| label: Getting odds scale.
 model2 %>%
  coef() %>%
-  exp()
+  exp() %>%
+  t()%>%
+  as.data.frame() %>%
+  gt()
+  
 ```
 
 ```{r}
