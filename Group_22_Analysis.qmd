@@ -290,7 +290,6 @@ kable(model_comparison, digits = 2, caption = "Model comparison values for diffe
 In this analysis, AIC and BIC were calculated for two competing models, Model 1 and Model 2. The results, presented in Table 5, show that Model 1 has a slightly lower AIC (690.89) compared to Model 2 (691.74). However, BIC for Model 2 (720.11) is slightly lower than for Model 1 (723.99), suggesting that Model 2 may be preferable when considering model complexity.
 
 These results indicate that while Model 1 provides a slightly better overall fit, Model 2 is more parsimonious according to BIC, which includes a stronger penalty for the number of parameters. The final model choice depends on the emphasis placed on model complexity versus fit.
-
 ## Odds
 
 We can obtain the odds scale $\frac{p}{1-p}$ by
