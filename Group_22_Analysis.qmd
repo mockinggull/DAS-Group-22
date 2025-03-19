@@ -110,6 +110,8 @@ After scaling，the range of the number of total length of uninterrupted sequenc
 
 ## Data Visualization
 
+In this section, we analyze the boxplots of key textual features to compare their distributions between spam and non-spam emails. Boxplots provide an insightful visualization of how different variables behave in each category, highlighting key statistics such as medians, interquartile ranges (IQRs), and potential outliers.
+
 ```{r}
 #| label: fig-boxplot.crl.tot
 #| fig-cap: Boxplot of total length of uninterrupted sequences of capitals.
@@ -118,6 +120,8 @@ ggplot(email_clean, aes(x = yesno, y = crl.tot)) +
   labs(x = "Spam indictor", y = "Uninterrupted sequences of capitals", 
        title = "Spam indictor with total length of uninterrupted sequences of capitals")
 ```
+
+The first boxplot examines the length of the longest uninterrupted sequence of capital letters. Capitalization is often used in spam emails to emphasize urgency or importance. The visualization reveals that spam emails tend to contain significantly longer sequences of capitalized text compared to non-spam emails. The extreme upper range and high number of outliers suggest that spam messages frequently employ long uppercase segments, potentially to highlight promotions or urgent calls to action. This feature is a strong indicator of spam-like behavior.
 
 ```{r}
 #| label: fig-boxplot.dollar
@@ -128,6 +132,8 @@ ggplot(email_clean, aes(x = yesno, y = dollar)) +
        title = "Spam indictor with occurrences of the dollar sign")
 ```
 
+Next, we consider the occurrences of the dollar sign (“\$”). The results indicate that spam emails have a significantly higher median frequency of "$" than non-spam emails. This suggests that spam messages frequently reference financial incentives, monetary amounts, or sales offers, reinforcing their promotional or fraudulent nature. The boxplot also displays a wide distribution with several extreme outliers, indicating that some spam emails heavily utilize the dollar sign to lure recipients with promises of wealth or investment opportunities.
+
 ```{r}
 #| label: fig-boxplot.bang
 #| fig-cap: Boxplot of occurrences of '!'.
@@ -136,6 +142,8 @@ ggplot(email_clean, aes(x = yesno, y = bang)) +
   labs(x = "Spam indictor", y = 'Occurrences of "!"', 
        title = 'Spam indictor with occurrences of "!"')
 ```
+
+The third boxplot investigates the occurrences of the exclamation mark (“!”). The results demonstrate that spam emails contain a much higher median number of exclamation marks than non-spam emails. This aligns with the general tendency of spam messages to use excessive punctuation to create a sense of urgency or excitement. The presence of multiple outliers further emphasizes that some spam emails employ an abnormally high number of exclamation marks, making this a useful feature for distinguishing spam content.
 
 ```{r}
 #| label: fig-boxplot.money
@@ -146,6 +154,8 @@ ggplot(email_clean, aes(x = yesno, y = money)) +
        title = 'Spam indictor with occurrences of "money"')
 ```
 
+Following this, we analyze the occurrences of the word “money” in emails. The visualization shows that spam emails have a noticeably higher median count of this word compared to non-spam emails. The interquartile range (IQR) of the spam category is also wider, indicating a greater variability in how frequently "money" appears. Additionally, a number of extreme outliers suggest that certain spam emails heavily emphasize monetary-related language, further distinguishing them from legitimate emails.
+
 ```{r}
 #| label: fig-boxplot.n000
 #| fig-cap: Boxplot of occurrences of '000'.
@@ -155,6 +165,8 @@ ggplot(email_clean, aes(x = yesno, y = n000)) +
        title = 'Spam indictor with occurrences of "000"')
 ```
 
+Next, we examine the occurrences of numerical sequences like “000”. The boxplot reveals that this feature appears more frequently in spam emails, with a higher median and broader spread. The presence of multiple outliers suggests that certain spam emails are particularly saturated with numerical expressions, possibly to emphasize large sums of money or create a sense of urgency in recipients. This supports the notion that spam emails often exploit numerical values to attract attention.
+
 ```{r}
 #| label: fig-boxplot.make
 #| fig-cap: Boxplot of occurrences of 'make'.
@@ -163,7 +175,9 @@ ggplot(email_clean, aes(x = yesno, y = make)) +
   labs(x = "Spam indictor", y = 'Occurrences of "make"', 
        title = 'Spam indictor with occurrences of "make"')
 ```
+Lastly, we analyze the occurrences of the word “make”. This word appears more frequently in spam emails, with a noticeably higher median compared to non-spam messages. Given its common use in phrases like "make money fast" or "make quick cash," this result supports the hypothesis that spam emails often contain persuasive or action-driven language. The distribution also suggests that some spam emails repeatedly use this word as part of their marketing or fraudulent strategies.
 
+Overall, these boxplots reveal distinct textual patterns in spam emails, reinforcing the idea that spam messages tend to use specific words, symbols, and formatting styles at significantly higher frequencies than legitimate emails. The presence of extreme outliers in certain variables further suggests that some spam messages adopt aggressive tactics to stand out. These findings provide valuable insights for developing spam detection models by incorporating these textual features as predictive indicators.
 # Formal Data Analysis
 
 ## Fitting Model in Log-odds
@@ -229,6 +243,8 @@ plot_model(model2, show.values = TRUE, transform = NULL,
 
 ## Variable Selection
 
+Variable selection is a crucial step in statistical modeling that aims to identify the most relevant predictors while excluding those that contribute little to the model’s explanatory power. This process helps improve model interpretability, reduce overfitting, and enhance predictive accuracy.
+
 ```{r}
 #| label: tbl-p_value_Comparation
 #| tbl-cap: p value Comparation.
@@ -247,7 +263,9 @@ combined_results %>%
   fmt_number(columns = c(P_Value_Model1, P_Value_Model2), decimals = 3)
 ```
 
-After fitting model
+In this analysis, variable selection was conducted by examining the p-values of each predictor in two different models. The p-values indicate the statistical significance of each variable, with lower values suggesting stronger evidence against the null hypothesis (i.e., the variable has a significant effect on the response variable). A comparison of p-values from Model 1 and Model 2 is presented in Table 4, where variables with high p-values (e.g., make in Model 1 with 
+p=0.153) were considered for removal, as they do not significantly contribute to the model.
+After fitting model.
 
 ```{r}
 #| label: Devariance_Comparation
@@ -258,7 +276,7 @@ dev_model2 <- deviance(model2)  # Residual deviance of model2
 cat("Deviance of Model 1:", dev_model1, "\n")
 cat("Deviance of Model 2:", dev_model2, "\n")
 ```
-
+Additionally, the impact of variable selection was assessed by comparing the residual deviance of both models. Lower deviance indicates a better fit, implying that the selected variables provide an improved explanation of the observed data. The final selection of variables balances statistical significance with model complexity, ensuring a robust and interpretable predictive model.
 ```{r}
 #| label: AIC_BIC
 #| tbl-cap: AIC & BIC of two models.
@@ -269,7 +287,9 @@ model_comparison <- bind_rows(
   dplyr::select(Model, AIC, BIC)
 kable(model_comparison, digits = 2, caption = "Model comparison values for different models")# Print the table with kable
 ```
+In this analysis, AIC and BIC were calculated for two competing models, Model 1 and Model 2. The results, presented in Table 5, show that Model 1 has a slightly lower AIC (690.89) compared to Model 2 (691.74). However, BIC for Model 2 (720.11) is slightly lower than for Model 1 (723.99), suggesting that Model 2 may be preferable when considering model complexity.
 
+These results indicate that while Model 1 provides a slightly better overall fit, Model 2 is more parsimonious according to BIC, which includes a stronger penalty for the number of parameters. The final model choice depends on the emphasis placed on model complexity versus fit.
 ## Odds
 
 We can obtain the odds scale $\frac{p}{1-p}$ by
