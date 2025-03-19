@@ -13,3 +13,9 @@ This study investigates the email text characteristics that have more influence 
 * n000 – Occurrences of the string ‘000’, as a percentage of the total number of characters
 * make – Occurrences of ‘make’, as a percentage of the total number of characters
 * yesno – A factor variable indicating if the email was spam, ‘y’, or not spam, ‘n’
+# Collaborators
+* Imtiaz Hossain
+* Sri Lalitha Mahathi Keshavaram Nidudavalli
+* Weiman Xu
+* Tingyuan Zhang
+* Bingyu Zhou
