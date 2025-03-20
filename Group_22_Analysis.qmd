@@ -292,7 +292,7 @@ model_comparison <- bind_rows(
 ) %>% 
   dplyr::select(Model, AIC, BIC)
 kable(model_comparison, digits = 2, 
-      caption = "Model comparison values for different models")# Print the table with kable
+      caption = "Model comparison values for different models")
 ```
 
 In this analysis, AIC and BIC were calculated for two competing models, Model 1 and Model 2. The results, presented in @tbl-AIC_BIC, show that Model 1 has a slightly lower AIC (690.89) compared to Model 2 (691.74). However, BIC for Model 2 (720.11) is slightly lower than for Model 1 (723.99), suggesting that Model 2 may be preferable when considering model complexity.
