@@ -180,7 +180,9 @@ Lastly, we analyze the occurrences of the word “make”. This word appears mor
 
 Overall, these boxplots reveal distinct textual patterns in spam emails, reinforcing the idea that spam messages tend to use specific words, symbols, and formatting styles at significantly higher frequencies than legitimate emails. The presence of extreme outliers in certain variables further suggests that some spam messages adopt aggressive tactics to stand out. These findings provide valuable insights for developing spam detection models by incorporating these textual features as predictive indicators.
 
+
 # Formal Data Analysis
+
 
 ## Fitting Model in Log-odds
 
@@ -226,6 +228,7 @@ We can extract the estimated coefficients to report the fitted model as follows.
 \end{align} where $p=\text{Prob}(yes)$ and $1-p=\text{Prob}(no)$. Hence, the log-odds of the instructor being spam increase by 0.443 for every one unit increase in scaled total length of uninterrupted sequences of capitals, when keeping other variables constant. Similarly, for a percentage of total number of characters for dollar sign, exclamation mark, money, and 000 for every one unit increase separately, the log-odds of the instructor being spam increase by 7.759, 2.732, 6.039, and 2.926.
 
 This provides us with a point estimate of how the log-odds changes with explanatory variables, however, we are also interested in producing a 95% confidence interval for these log-odds.
+
 
 ```{r}
 #| label: tbl-summary_confident_of_model2_coefficient
@@ -295,7 +298,9 @@ kable(model_comparison, digits = 2, caption = "Model comparison values for diffe
 
 In this analysis, AIC and BIC were calculated for two competing models, Model 1 and Model 2. The results, presented in @tbl-AIC_BIC, show that Model 1 has a slightly lower AIC (690.89) compared to Model 2 (691.74). However, BIC for Model 2 (720.11) is slightly lower than for Model 1 (723.99), suggesting that Model 2 may be preferable when considering model complexity.
 
+
 These results indicate that while Model 1 provides a slightly better overall fit, Model 2 is more parsimonious according to BIC, which includes a stronger penalty for the number of parameters. The final model choice depends on the emphasis placed on model complexity versus fit.
+
 
 ## Odds
 
@@ -319,7 +324,9 @@ model2 %>%
 
 The @tbl-odds_scale shows the odds scale of each variables.
 
+
 -   On the odds scale, the value of the intercept (0.19) give the odds of a email being spam given all explanatory variables equals 0.
+
 
 -   For total length of uninterrupted sequences of capitals, we have an odds of 1.56, which indicates that for every 1 unit increase in crl.tot, the probability of the email being spam increase by 56%.
 
@@ -345,6 +352,8 @@ plot_model(model2, show.values = TRUE,
 We can obtain the probability $p=\text{Prob}(\text{spam})$ by $$
 p=\frac{exp(`r mod2coefs[1]` + `r mod2coefs[2]` \cdot \textrm{crl.tot} +`r mod2coefs[3]` \cdot \textrm{dollar} +`r mod2coefs[4]` \cdot \textrm{bang} +`r mod2coefs[5]` \cdot \textrm{money} +`r mod2coefs[6]`\cdot \textrm{n000})}{1+exp(`r mod2coefs[1]` + `r mod2coefs[2]` \cdot \textrm{crl.tot} +`r mod2coefs[3]` \cdot \textrm{dollar} +`r mod2coefs[4]` \cdot \textrm{bang} +`r mod2coefs[5]` \cdot \textrm{money} +`r mod2coefs[6]`\cdot \textrm{n000})}$$
 
+
 # Conclusion
 
 Model 2 effectively identifies the key characteristics of spam emails, providing insights that can improve the company's spam filter. By refining the model and removing non-essential predictors, we ensure a more accurate and efficient spam detection system, reducing false positives while effectively blocking unwanted emails.
+
