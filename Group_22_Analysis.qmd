@@ -307,15 +307,15 @@ The @tbl-odds_scale shows the odds scale of each variables.
 
 -   On the odds scale, the value of the intercept (0.18) give the odds of a email being spam given all explanatory variables equals 0.
 
--   For total length of uninterrupted sequences of capitals, we have an odds of 1.32, which indicates that for every 1 unit increase in crl.tot, the probability of the email being spam increase by 132%.
+-   For total length of uninterrupted sequences of capitals, we have an odds of 1.32, which indicates that for every 1 unit increase in crl.tot, the probability of the email being spam increase by 32%.
 
--   For a percentage of total number of occurrences of the dollar sign, we have an odds of 3573.44, which indicates that for every 1 unit increase in dollar, the probability of the email being spam increase by a factor of 357344%.
+-   For a percentage of total number of occurrences of the dollar sign, we have an odds of 3573.44, which indicates that for every 1 unit increase in dollar, the probability of the email being spam increase by a factor of 357244%.
 
--   For a percentage of total number of occurrences of the exclamation mark, we have an odds of 18.82, which indicates that for every 1 unit increase in bang, the probability of the email being spam increase by a factor of 1882%.
+-   For a percentage of total number of occurrences of the exclamation mark, we have an odds of 18.82, which indicates that for every 1 unit increase in bang, the probability of the email being spam increase by a factor of 1782%.
 
--   For a percentage of total number of occurrences of money, we have an odds of 341.55, which indicates that for every 1 unit increase in money, the probability of the email being spam increase by a factor of 34155%.
+-   For a percentage of total number of occurrences of money, we have an odds of 341.55, which indicates that for every 1 unit increase in money, the probability of the email being spam increase by a factor of 34055%.
 
--   For a percentage of total number of occurrences of '000', we have an odds of 30.79, which indicates that for every 1 unit increase in n000, the odds of the email being spam increase by a factor of 3079%.
+-   For a percentage of total number of occurrences of '000', we have an odds of 30.79, which indicates that for every 1 unit increase in n000, the odds of the email being spam increase by a factor of 2979%.
 
 The corresponding 95% confidence interval of odds can be displayed graphically in @fig-CI-of-odds-scale.
 
