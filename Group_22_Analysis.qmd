@@ -1,5 +1,5 @@
 ---
-title: "The Influence of Text Characteristics for Email Classification"
+title: "The Influence of Texts and Characteristics for Email Classification"
 author: "Group 22"
 number-sections: true
 format: 
@@ -47,7 +47,7 @@ This analysis focuses on identifying the characteristics of email messages that 
 
 # Exploratory Data Analysis {#sec-EDA}
 
-## Data Visualization
+## Correlation
 
 ```{r}
 #| label: fig-pairs
@@ -59,49 +59,32 @@ ggpairs(email[,1:6]) +
     size = 1))
 ```
 
-By @fig-pairs, we see that the correlations between each explanatory is not larger than 0.4, which means the relationship between each variable is weak. It suggests that there is not much concern about multicollinearity. From the scatter plot, there are some points are far away from cluster. Those points can be removed as outliers to improve model's stability.
-
-## Removing Outliers
-
-```{r}
-#| label: Remove Outliers by z score
-remove_outliers_rowwise_zscore <- function(df) {
-  df_clean <- df
-  for (col_name in names(df)) {
-    if (is.numeric(df[[col_name]])) {
-      z_scores <- scale(df[[col_name]])
-      df_clean <- df_clean[abs(z_scores) <= 3, ]
-    }
-  }
-  return(na.omit(df_clean))
-}
-email_clean <- remove_outliers_rowwise_zscore(email)
-```
-
-To minimize outliers while preserving as much information as possible, z score are used to remove outliers.
+By @fig-pairs, we see that the correlations between each explanatory is not larger than 0.4, which means the relationship between each variable is weak. It suggests that there is not much concern about multicollinearity. From the scatter plot, the range of most points are around 0, except crl.tot. 
 
 ## Scaling Data
+
+
 
 ```{r}
 #| label: tbl-range
 #| tbl-cap: Range of each variables.
-range_table <- apply(email_clean[-7], 2, range)
+range_table <- apply(email[-7], 2, range)
 range_df <- as.data.frame(t(range_table))
 colnames(range_df) <- c("Min", "Max")
-range_df$Variables<-colnames(email_clean[-7])
+range_df$Variables<-colnames(email[-7])
 gt(range_df[,c(3,1,2)])
 ```
 
-After removing outliers, the @tbl-range shows the range of each variable. It is clear that the range of the number of total length of uninterrupted sequences of capitals is extremely large than others. Hence, normalization are processed to reduce bias when large scale may dominates the cost function.
+The @tbl-range shows the range of each variable. It is clear that the range of the number of total length of uninterrupted sequences of capitals is extremely large than others. Hence, normalization are processed to reduce bias when large scale may dominates the cost function.
 
 ```{r}
 #| label: tbl-scaled_range
 #| tbl-cap: Range of each scaled variables.
-email_clean$crl.tot<-scale(email_clean$crl.tot)
-range_table <- apply(email_clean[-7], 2, range)
+email$crl.tot<-scale(email$crl.tot)
+range_table <- apply(email[-7], 2, range)
 range_df <- as.data.frame(t(range_table))
 colnames(range_df) <- c("Min", "Max")
-range_df$Variables<-colnames(email_clean[-7])
+range_df$Variables<-colnames(email[-7])
 gt(range_df[, c(3,1,2)]) %>%
   fmt_number(columns = everything(),decimals = 2)
 ```
@@ -115,7 +98,7 @@ In this section, we analyze the boxplots of key textual features to compare thei
 ```{r}
 #| label: fig-boxplot.crl.tot
 #| fig-cap: Boxplot of total length of uninterrupted sequences of capitals.
-ggplot(email_clean, aes(x = yesno, y = crl.tot)) +
+ggplot(email, aes(x = yesno, y = crl.tot)) +
   geom_boxplot() +
   labs(x = "Spam indictor", y = "Uninterrupted sequences of capitals", 
        title = "Spam indictor with total length 
@@ -127,7 +110,7 @@ The first boxplot examines the length of the longest uninterrupted sequence of c
 ```{r}
 #| label: fig-boxplot.dollar
 #| fig-cap: Boxplot of occurrences of the dollar sign.
-ggplot(email_clean, aes(x = yesno, y = dollar)) +
+ggplot(email, aes(x = yesno, y = dollar)) +
   geom_boxplot() +
   labs(x = "Spam indictor", y = "Occurrences of the dollar sign", 
        title = "Spam indictor with occurrences of the dollar sign")
@@ -138,7 +121,7 @@ Next, we consider the occurrences of the dollar sign (“\$”). The results in 
 ```{r}
 #| label: fig-boxplot.bang
 #| fig-cap: Boxplot of occurrences of '!'.
-ggplot(email_clean, aes(x = yesno, y = bang)) +
+ggplot(email, aes(x = yesno, y = bang)) +
   geom_boxplot() +
   labs(x = "Spam indictor", y = 'Occurrences of "!"', 
        title = 'Spam indictor with occurrences of "!"')
@@ -149,7 +132,7 @@ The @fig-boxplot.bang investigates the occurrences of the exclamation mark (“!
 ```{r}
 #| label: fig-boxplot.money
 #| fig-cap: Boxplot of occurrences of "money".
-ggplot(email_clean, aes(x = yesno, y = money)) +
+ggplot(email, aes(x = yesno, y = money)) +
   geom_boxplot() +
   labs(x = "Spam indictor", y = 'Occurrences of "money"', 
        title = 'Spam indictor with occurrences of "money"')
@@ -160,7 +143,7 @@ Following @fig-boxplot.money, we analyze the occurrences of the word “money”
 ```{r}
 #| label: fig-boxplot.n000
 #| fig-cap: Boxplot of occurrences of '000'.
-ggplot(email_clean, aes(x = yesno, y = n000)) +
+ggplot(email, aes(x = yesno, y = n000)) +
   geom_boxplot() +
   labs(x = "Spam indictor", y = 'Occurrences of "000"', 
        title = 'Spam indictor with occurrences of "000"')
@@ -171,7 +154,7 @@ Next, we examine the occurrences of numerical sequences like “000”. The @fig
 ```{r}
 #| label: fig-boxplot.make
 #| fig-cap: Boxplot of occurrences of 'make'.
-ggplot(email_clean, aes(x = yesno, y = make)) +
+ggplot(email, aes(x = yesno, y = make)) +
   geom_boxplot() +
   labs(x = "Spam indictor", y = 'Occurrences of "make"', 
        title = 'Spam indictor with occurrences of "make"')
@@ -187,7 +170,7 @@ Overall, these boxplots reveal distinct textual patterns in spam emails, reinfor
 
 ```{r}
 #| label: fiting model1
-model1 <- glm(yesno ~ crl.tot+dollar+bang+money+n000+make, data = email_clean, 
+model1 <- glm(yesno ~ crl.tot+dollar+bang+money+n000+make, data = email, 
              family = binomial(link = "logit"))
 ```
 
@@ -203,7 +186,7 @@ The fitted linear model 1 is \begin{align}
 
 ```{r}
 #| label: fiting model2
-model2 <- glm(yesno ~ crl.tot+dollar+bang+money+n000, data = email_clean, 
+model2 <- glm(yesno ~ crl.tot+dollar+bang+money+n000, data = email, 
              family = binomial(link = "logit"))
 ```
 
@@ -269,8 +252,8 @@ combined_results %>%
 In this analysis, variable selection was conducted by examining the p-values of each predictor in two different models. The p-values indicate the statistical significance of each variable, with lower values suggesting stronger evidence against the null hypothesis (i.e., the variable has a significant effect on the response variable). A comparison of p-values from Model 1 and Model 2 is presented in @tbl-p_value_Comparation, where variables with high p-values (e.g., make in Model 1 with p=0.153) were considered for removal, as they do not significantly contribute to the model. After fitting model.
 
 ```{r}
-#| label: tbl-Devariance_Comparation
-#| tbl-cap: Devariance Comparation.
+#| label: tbl-Deviance_Comparation
+#| tbl-cap: Deviance Comparation.
 dev_model1 <- deviance(model1)  # Residual deviance of model1
 dev_model2 <- deviance(model2)  # Residual deviance of model2
 dev<-data.frame(c(dev_model1,dev_model2))
@@ -279,7 +262,7 @@ dev$Model<-c('Model1','Model2')
 gt(dev[2:1])
 ```
 
-Additionally, the impact of variable selection was assessed by comparing the residual deviance of both models which show in @tbl-Devariance_Comparation. We want to test that $$H_{0}:\beta_{0}=(\beta_{crl.tot},\beta_{dollar},\beta_{bang},\beta_{money},\beta_{n000})^{T}$$ and $$H_{1}:\beta_{1}=(\beta_{crl.tot},\beta_{dollar},\beta_{bang},\beta_{money},\beta_{n000},\beta_{make})^{T}$$ Let $\text{D}_{0}$ the deviance of model 1 and $\text{D}_{1}$ the deviance of model 2. Since $$\text{D}_{0}-\text{D}_{1}=754.0444-752.4441=1.6003<\chi^{2}(0.95,1)=3.84$$we have no significant evidence to reject the null hypothesis. Again we conclude that there is no evidence of lack of fit for the logit model 2. Hence, model 2 is acceptable by compare the deviance.
+Additionally, the impact of variable selection was assessed by comparing the residual deviance of both models which show in @tbl-Deviance_Comparation. We want to test that $$H_{0}:\beta_{0}=(\beta_{crl.tot},\beta_{dollar},\beta_{bang},\beta_{money},\beta_{n000})^{T}$$ and $$H_{1}:\beta_{1}=(\beta_{crl.tot},\beta_{dollar},\beta_{bang},\beta_{money},\beta_{n000},\beta_{make})^{T}$$ Let $\text{D}_{0}$ the deviance of model 1 and $\text{D}_{1}$ the deviance of model 2. Since $$\text{D}_{0}-\text{D}_{1}=754.0444-752.4441=1.6003<\chi^{2}(0.95,1)=3.84$$we have no significant evidence to reject the null hypothesis. Again we conclude that there is no evidence of lack of fit for the logit model 2. Hence, model 2 is acceptable by compare the deviance.
 
 The final selection of variables balances statistical significance with model complexity, ensuring a robust and interpretable predictive model.
 
@@ -353,4 +336,4 @@ In short, this analysis are trying to find out the relationship between the cert
 
 First, correlation for each characters and words are shown in @fig-pairs . Also, the range of each variable before and after scaling are shown in @tbl-range and @tbl-scaled_range . Boxplots for each variable are explored.
 
-Then, a generalized linear model is fitted for classifying non-spam and spam. After model selection, model 2 with total length of uninterrupted sequences of capitals, word 'dollar', word 'money', character '!', and character '000' are selected. Model 2 effectively identifies the key characteristics of spam emails, providing insights that can improve the company's spam filter. The result of odds ratio are presented in @tbl-odds_scale . To assess the model, hypothesis test by deviance are used and compared in @tbl-Devariance_Comparation . AIC and BIC are also concerned in @tbl-AIC_BIC . By refining the model and removing non-essential predictors, we ensure a more accurate and efficient spam detection system, reducing false positives while effectively blocking unwanted emails.
+Then, a generalized linear model is fitted for classifying non-spam and spam. After model selection, model 2 with total length of uninterrupted sequences of capitals, word 'dollar', word 'money', character '!', and character '000' are selected. Model 2 effectively identifies the key characteristics of spam emails, providing insights that can improve the company's spam filter. The result of odds ratio are presented in @tbl-odds_scale . To assess the model, hypothesis test by deviance are used and compared in @tbl-Deviance_Comparation . AIC and BIC are also concerned in @tbl-AIC_BIC . By refining the model and removing non-essential predictors, we ensure a more accurate and efficient spam detection system, reducing false positives while effectively blocking unwanted emails.
