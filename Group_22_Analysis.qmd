@@ -89,6 +89,7 @@ gt(range_df[, c(3,1,2)]) %>%
   fmt_number(columns = everything(),decimals = 2)
 ```
 
+
 After scaling，by @tbl-scaled_range, the range of the number of total length of uninterrupted sequences of capitals is shrank to a range which is close to others.
 
 ## Data Visualization
@@ -207,7 +208,7 @@ This means that estimates from the logistic regression model are for a change on
 
 We can extract the estimated coefficients to report the fitted model as follows. The fitted linear model 2 is \begin{align}
 \ln\left(\frac{p}{1-p}\right) &= \alpha + \beta_{crl.tot} \cdot \textrm{crl.tot} +\beta_{dollar} \cdot \textrm{dollar} +\beta_{bang} \cdot \textrm{bang} +\nonumber\\&\hspace{0.5cm}\beta_{money} \cdot \textrm{money} +\beta_{n000} \cdot \textrm{n000} \nonumber\\&= `r mod2coefs[1]` + `r mod2coefs[2]` \cdot \textrm{crl.tot} +`r mod2coefs[3]` \cdot \textrm{dollar} +`r mod2coefs[4]` \cdot \textrm{bang} +\nonumber\\&`r mod2coefs[5]` \cdot \textrm{money} +`r mod2coefs[6]`\cdot \textrm{n000} \nonumber
-\end{align} where $p=\text{Prob}(yes)$ and $1-p=\text{Prob}(no)$. Hence, the log-odds of the instructor being spam increase by 0.443 for every one unit increase in scaled total length of uninterrupted sequences of capitals, when keeping other variables constant. Similarly, for a percentage of total number of characters for dollar sign, exclamation mark, money, and 000 for every one unit increase separately, the log-odds of the instructor being spam increase by 7.759, 2.732, 6.039, and 2.926.
+\end{align} where $p=\text{Prob}(yes)$ and $1-p=\text{Prob}(no)$. Hence, the log-odds of the instructor being spam increase by 0.28 for every one unit increase in scaled total length of uninterrupted sequences of capitals, when keeping other variables constant. Similarly, for a percentage of total number of characters for dollar sign, exclamation mark, money, and 000 for every one unit increase separately, the log-odds of the instructor being spam increase by 8.181, 2.935, 5.833, and 3.427.
 
 This provides us with a point estimate of how the log-odds changes with explanatory variables, however, we are also interested in producing a 95% confidence interval for these log-odds.
 
@@ -218,7 +219,7 @@ confint(model2) %>%
   kable()
 ```
 
-Hence, by @tbl-summary_confident_of_model2_coefficient, the point estimate for crl.tot is 0.44, which has a corresponding 95% confidence interval of (0.23, 0.66). Similarly, the point estimate for dollar is 7.76, with a 95% confidence interval of (4.90, 10.91). For bang, the point estimate is 2.73, with a 95% confidence interval of (2.11, 3.42). For money, the point estimate is 6.04, with a 95% confidence interval of (3.58, 9.22). For n000, the point estimate is 2.93, with a 95% confidence interval of (1.24, 5.14). This can be displayed graphically in the @fig-CI-of-Log-odds.
+Hence, by @tbl-summary_confident_of_model2_coefficient, the point estimate for crl.tot is 0.28, which has a corresponding 95% confidence interval of (0.09, 0.47). Similarly, the point estimate for dollar is 8.18, with a 95% confidence interval of (5.31, 11.36). For bang, the point estimate is 2.93, with a 95% confidence interval of (2.30, 3.63). For money, the point estimate is 5.83, with a 95% confidence interval of (3.65, 8.57). For n000, the point estimate is 3.43, with a 95% confidence interval of (1.65, 5.71). This can be displayed graphically in the @fig-CI-of-Log-odds.
 
 ```{r}
 #| label: fig-CI-of-Log-odds
@@ -249,7 +250,7 @@ combined_results %>%
   fmt_number(columns = c(P_Value_Model1, P_Value_Model2), decimals = 3)
 ```
 
-In this analysis, variable selection was conducted by examining the p-values of each predictor in two different models. The p-values indicate the statistical significance of each variable, with lower values suggesting stronger evidence against the null hypothesis (i.e., the variable has a significant effect on the response variable). A comparison of p-values from Model 1 and Model 2 is presented in @tbl-p_value_Comparation, where variables with high p-values (e.g., make in Model 1 with p=0.153) were considered for removal, as they do not significantly contribute to the model. After fitting model.
+In this analysis, variable selection was conducted by examining the p-values of each predictor in two different models. The p-values indicate the statistical significance of each variable, with lower values suggesting stronger evidence against the null hypothesis (i.e., the variable has a significant effect on the response variable). A comparison of p-values from Model 1 and Model 2 is presented in @tbl-p_value_Comparation, where variables with high p-values (e.g., make in Model 1 with p=0.263) were considered for removal, as they do not significantly contribute to the model. After fitting model.
 
 ```{r}
 #| label: tbl-Deviance_Comparation
@@ -278,7 +279,7 @@ kable(model_comparison, digits = 2,
       caption = "Model comparison values for different models")
 ```
 
-In this analysis, AIC and BIC were calculated for two competing models, Model 1 and Model 2. The results, presented in @tbl-AIC_BIC, show that Model 1 has a slightly lower AIC (690.89) compared to Model 2 (691.74). However, BIC for Model 2 (720.11) is slightly lower than for Model 1 (723.99), suggesting that Model 2 may be preferable when considering model complexity.
+In this analysis, AIC and BIC were calculated for two competing models, Model 1 and Model 2. The results, presented in @tbl-AIC_BIC, show that Model 2 has a slightly lower AIC (766.04) compared to Model 1 (766.44). Also, BIC for Model 2 (794.99) is lower than for Model 1 (800.21), suggesting that Model 2 may be preferable when considering model complexity.
 
 These results indicate that while Model 1 provides a slightly better overall fit, Model 2 is more parsimonious according to BIC, which includes a stronger penalty for the number of parameters. The final model choice depends on the emphasis placed on model complexity versus fit.
 
@@ -304,17 +305,17 @@ model2 %>%
 
 The @tbl-odds_scale shows the odds scale of each variables.
 
--   On the odds scale, the value of the intercept (0.19) give the odds of a email being spam given all explanatory variables equals 0.
+-   On the odds scale, the value of the intercept (0.18) give the odds of a email being spam given all explanatory variables equals 0.
 
--   For total length of uninterrupted sequences of capitals, we have an odds of 1.56, which indicates that for every 1 unit increase in crl.tot, the probability of the email being spam increase by 56%.
+-   For total length of uninterrupted sequences of capitals, we have an odds of 1.32, which indicates that for every 1 unit increase in crl.tot, the probability of the email being spam increase by 32%.
 
--   For a percentage of total number of occurrences of the dollar sign, we have an odds of 2343.40, which indicates that for every 1 unit increase in dollar, the probability of the email being spam increase by a factor of 234240%.
+-   For a percentage of total number of occurrences of the dollar sign, we have an odds of 3573.44, which indicates that for every 1 unit increase in dollar, the probability of the email being spam increase by a factor of 357244%.
 
--   For a percentage of total number of occurrences of the exclamation mark, we have an odds of 15.36, which indicates that for every 1 unit increase in bang, the probability of the email being spam increase by a factor of 1436%.
+-   For a percentage of total number of occurrences of the exclamation mark, we have an odds of 18.82, which indicates that for every 1 unit increase in bang, the probability of the email being spam increase by a factor of 1782%.
 
--   For a percentage of total number of occurrences of money, we have an odds of 419.31, which indicates that for every 1 unit increase in money, the probability of the email being spam increase by a factor of 41831%.
+-   For a percentage of total number of occurrences of money, we have an odds of 341.55, which indicates that for every 1 unit increase in money, the probability of the email being spam increase by a factor of 34055%.
 
--   For a percentage of total number of occurrences of '000', we have an odds of 18.65, which indicates that for every 1 unit increase in n000, the odds of the email being spam increase by a factor of 1765%.
+-   For a percentage of total number of occurrences of '000', we have an odds of 30.79, which indicates that for every 1 unit increase in n000, the odds of the email being spam increase by a factor of 2979%.
 
 The corresponding 95% confidence interval of odds can be displayed graphically in @fig-CI-of-odds-scale.
 
